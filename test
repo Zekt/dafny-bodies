@@ -1,0 +1,21 @@
+[Not(Implies(lblpos(And(%lbl%+4, True)),
+             And(Implies(lblpos(And(%lbl%+3, True)),
+                         Implies(100 < n,
+                                 Implies(And(r@0 == n - 10, r@2 == r@0),
+                                         Implies(lblpos(And(%lbl%+0, True)),
+                                                 lblneg(Or(%lbl%@1, Implies(100 < n, r@2 > 90))))))),
+                 Implies(lblpos(And(%lbl%+2, True)),
+                         Implies(n <= 100,
+                                 Implies(And(r@1 == n + 100, r@2 == r@1),
+                                         Implies(lblpos(And(%lbl%+0, True)),
+                                                 lblneg(Or(%lbl%@1, Implies(100 < n, r@2 > 90))))))))))]
+
+~ (l4 & T ->
+    (l3 & T ->
+      (100 < n  ->
+        (r0 == n - 10 ->
+          (l0 & T -> l1 or (100 < n -> r0 > 90))))) &
+    (l2 & T ->
+      (n <= 100 ->
+        (r1 == n + 100 ->
+          (l0 & T -> l1 or (100 < n -> r1 > 90))))))

@@ -5,4 +5,4 @@ import functools
 #joinlines = lambda f: functools.reduce(lambda l1,l2: l1 + l2, f)
 #js = joinlines(mc_file.readlines())
 #print(js)
-parsed = z3.parse_smt2_file('mc.z3')
+parsed = z3.parse_smt2_file('test.z3')
