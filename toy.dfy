@@ -85,19 +85,26 @@ lemma RI(global: Global)
   //              && global.l2p_ram[la] == global.pas[i]);
 {
   var i := 0;
-  var j := 0;
-  var jj := j;
-  var la := 0;
-//  while (i < global.p)
-//  {
+  var j := global.p;
+  var jj := 0;
+  var la := global.las[i];
+  assert 0 <= global.p <= global.N_DIFF;
+  //while (i < global.p)
+  //  invariant j == global.p;
+  //  //invariant notin(i, j, la, global.las);
+  //  //invariant 0 <= i <= global.p < global.las.Length;
+  //  invariant exists i | 0 <= i <= global.p < global.las.Length :: notin(i, global.p, la, global.las);
+  //{
+    j := i;
+    jj := j;
     la := global.las[i];
-    assert 0 <= global.p <= global.N_DIFF;
     var flag := false;
     while (j < global.p)
       invariant 0 <= i <= jj < global.las.Length
+      invariant 0 <= i <= j < global.las.Length
       invariant jj <= global.p
       invariant global.las[i] == la
-      invariant notin(i, jj, la, global.las)
+      invariant notin(i, j, la, global.las)
       invariant 0 <= j <= global.p
       invariant flag == true ==> jj == j - 1
     {
@@ -110,16 +117,12 @@ lemma RI(global: Global)
       j := j + 1;
     }
     assert j == global.p;
-    assert flag == true ==> jj == global.p - 1;
-    //i := i + 1;
-//}
-  //assert 0 <= i <= global.p;
-  //assert global.p < global.las.Length;
-  //assert jj <= global.p < global.las.Length;
-  assert jj <= global.p;
-  assert flag == true ==> notin(i, global.p, la, global.las);
-  //assert 0 <= i <= jj < global.las.Length;
-  //assert exists i | 0 <= i <= jj < global.las.Length :: notin(i, jj, la, global.las);
+    //assert flag == true ==> jj == global.p - 1;
+    //assert notin(i, global.p, la, global.las);
+    //assert 0 <= i <= global.p < global.las.Length;
+    assert exists j | 0 <= j <= global.p < global.las.Length :: notin(j, global.p, la, global.las);
+  //  i := i + 1;
+  //}
 }
 
 predicate notin(i: int, j: int, la: int, arr: array<int>)
@@ -128,3 +131,11 @@ predicate notin(i: int, j: int, la: int, arr: array<int>)
 {
   forall k | i < k < j :: arr[k] != la
 }
+
+//lemma RI2(i: int, j: int, la: int, arr: array<int>)
+//  requires notin(i, j, la, arr)
+//  ensures forall jj :: j <= jj < arr.Length ==> notin(i, jj, la, arr)
+//{
+//  var i1 := i;
+//  while(i1 < j)
+//}
