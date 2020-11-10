@@ -85,44 +85,50 @@ lemma RI(global: Global)
   //              && global.l2p_ram[la] == global.pas[i]);
 {
   var i := 0;
+  var lbnd := i;
+  var rbnd := global.p;
   var j := global.p;
   var jj := 0;
   var la := global.las[i];
   assert 0 <= global.p <= global.N_DIFF;
-  //while (i < global.p)
+  while (i < global.p)
   //  invariant j == global.p;
   //  //invariant notin(i, j, la, global.las);
-  //  //invariant 0 <= i <= global.p < global.las.Length;
-  //  invariant exists i | 0 <= i <= global.p < global.las.Length :: notin(i, global.p, la, global.las);
-  //{
-    j := i;
-    jj := j;
-    la := global.las[i];
-    var flag := false;
-    while (j < global.p)
-      invariant 0 <= i <= jj < global.las.Length
-      invariant 0 <= i <= j < global.las.Length
-      invariant jj <= global.p
-      invariant global.las[i] == la
-      invariant notin(i, j, la, global.las)
-      invariant 0 <= j <= global.p
-      invariant flag == true ==> jj == j - 1
+    invariant 0 <= i <= global.p < global.las.Length;
+    invariant la == global.las[i];
+    invariant exists rbnd | 0 <= rbnd <= global.p < global.las.Length :: notin(rbnd, global.p, global.las[i], global.las);
+  {
+    lbnd := i;
+    rbnd := i;
+    //jj := j;
+    la := global.las[lbnd];
+    //var flag := false;
+    while (rbnd < global.p)
+      //invariant 0 <= i <= jj < global.las.Length
+      invariant 0 <= lbnd <= rbnd < global.las.Length
+      //invariant jj <= global.p
+      invariant global.las[lbnd] == la
+      invariant notin(lbnd, rbnd, la, global.las)
+      invariant j <= global.p
+      //invariant flag == true ==> jj == j - 1
     {
-      flag := true;
-      jj := j;
-      if (global.las[jj] == la)
+      //flag := true;
+      //jj := j;
+      if (global.las[rbnd] == la)
       {
-        i := jj;
+        lbnd := rbnd;
       }
-      j := j + 1;
+      rbnd := rbnd + 1;
     }
-    assert j == global.p;
+    //assert rbnd == global.p;
     //assert flag == true ==> jj == global.p - 1;
     //assert notin(i, global.p, la, global.las);
     //assert 0 <= i <= global.p < global.las.Length;
-    assert exists j | 0 <= j <= global.p < global.las.Length :: notin(j, global.p, la, global.las);
-  //  i := i + 1;
-  //}
+    //assert exists lbnd | i <= lbnd <= global.p < global.las.Length ::
+    //                notin(lbnd, global.p, la, global.las);
+    i := i + 1;
+  }
+  assert i == global.p;
 }
 
 predicate notin(i: int, j: int, la: int, arr: array<int>)
