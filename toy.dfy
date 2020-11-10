@@ -71,9 +71,10 @@ class Global{
 //    return global1;
 //}
 
-lemma RI(global: Global)
+lemma RI(global: Global, i: int)
   requires global.init()
   requires global.inv()
+  requires 0 <= i <= global.p
   //ensures global.p < global.N_DIFF
   //ensures global.las.Length == global.N_DIFF
   //ensures global.p < global.las.Length
@@ -83,33 +84,46 @@ lemma RI(global: Global)
   //              && global.las[i] == la
   //              && (forall j :: j > i ==> !(global.las[j] == la))
   //              && global.l2p_ram[la] == global.pas[i]);
+  ensures exists lbnd | i <= lbnd <= global.p ::
+                    notin(lbnd, global.p, global.las[i], global.las);
 {
-  var i := 0;
+  //var i := 0;
   var lbnd := i;
-  var rbnd := global.p;
+  var rbnd := i;
   var j := global.p;
   var jj := 0;
   var la := global.las[i];
+  assert 0 <= rbnd <= global.p < global.las.Length;
+  //assert notin(rbnd, global.p, global.las[0], global.las);
+  //assert exists rbnd | 0 <= rbnd <= global.p < global.las.Length ::
+  //                       notin(rbnd, global.p, global.las[i], global.las);
+  //assert forall idx | 0 <= idx <= i :: 
+  //         exists rbnd | 0 <= rbnd <= global.p < global.las.Length ::
+  //                  notin(rbnd, global.p, global.las[idx], global.las);
   assert 0 <= global.p <= global.N_DIFF;
-  while (i < global.p)
-  //  invariant j == global.p;
-  //  //invariant notin(i, j, la, global.las);
-    invariant 0 <= i <= global.p < global.las.Length;
-    invariant la == global.las[i];
-    invariant exists rbnd | 0 <= rbnd <= global.p < global.las.Length :: notin(rbnd, global.p, global.las[i], global.las);
-  {
+  //while (i < global.p)
+  ////  invariant j == global.p;
+  ////  //invariant notin(i, j, la, global.las);
+  //  invariant 0 <= i <= global.p < global.las.Length;
+  //  invariant la == global.las[i];
+  //  invariant exists rbnd | i <= rbnd <= global.p < global.las.Length ::
+  //                     notin(rbnd, global.p, global.las[i], global.las);
+  //  invariant forall idx | 0 <= idx < i ::
+  //              exists rbnd | idx <= rbnd <= global.p < global.las.Length ::
+  //                       notin(rbnd, global.p, global.las[idx], global.las);
+  //{
     lbnd := i;
     rbnd := i;
     //jj := j;
-    la := global.las[lbnd];
+    la := global.las[i];
     //var flag := false;
     while (rbnd < global.p)
       //invariant 0 <= i <= jj < global.las.Length
-      invariant 0 <= lbnd <= rbnd < global.las.Length
+      invariant i <= lbnd <= rbnd <= global.p < global.las.Length
       //invariant jj <= global.p
       invariant global.las[lbnd] == la
       invariant notin(lbnd, rbnd, la, global.las)
-      invariant j <= global.p
+      //invariant j <= global.p
       //invariant flag == true ==> jj == j - 1
     {
       //flag := true;
@@ -120,15 +134,19 @@ lemma RI(global: Global)
       }
       rbnd := rbnd + 1;
     }
-    //assert rbnd == global.p;
+    assert rbnd == global.p;
     //assert flag == true ==> jj == global.p - 1;
     //assert notin(i, global.p, la, global.las);
     //assert 0 <= i <= global.p < global.las.Length;
-    //assert exists lbnd | i <= lbnd <= global.p < global.las.Length ::
-    //                notin(lbnd, global.p, la, global.las);
-    i := i + 1;
-  }
-  assert i == global.p;
+    assert notin(lbnd, rbnd, la, global.las);
+    assert exists lbnd | i <= lbnd <= global.p < global.las.Length ::
+                    notin(lbnd, global.p, la, global.las);
+  //  i := i + 1;
+  //}
+  //assert i == global.p;
+  //assert forall i: int :: (0 <= i < global.p < global.las.Length) ==>
+  //         (exists rbnd | 0 <= rbnd <= global.p < global.las.Length ::
+  //           notin(rbnd, global.p, global.las[i], global.las));
 }
 
 predicate notin(i: int, j: int, la: int, arr: array<int>)
