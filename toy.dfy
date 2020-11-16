@@ -86,15 +86,20 @@ lemma AllRI(global: Global)
     invariant exists lbnd | i <= lbnd <= global.p ::
                             global.las[i] == global.las[lbnd]
                          && notin(lbnd, global.p, global.las[i], global.las);
+    invariant forall i | 0 <= i < bnd ::
+                exists lbnd | i <= lbnd <= global.p ::
+                         global.las[i] == global.las[lbnd]
+                      && notin(lbnd, global.p, global.las[i], global.las);
     invariant i <= bnd;
   {
     i := i + 1;
     RI(global, i);
     bnd := bnd + 1;
   }
-  assert exists lbnd | i <= lbnd <= global.p ::
-                global.las[i] == global.las[lbnd]
-             && notin(lbnd, global.p, global.las[i], global.las);
+//  assert forall i | 0 <= i <= bnd ::
+//           exists lbnd | i <= lbnd <= global.p ::
+//                    global.las[i] == global.las[lbnd]
+//                 && notin(lbnd, global.p, global.las[i], global.las);
 }
 
 lemma RI(global: Global, i: int)
