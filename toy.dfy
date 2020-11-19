@@ -30,6 +30,16 @@ class Global{
     && l2p_flash.Length == N_LAS
     && l2p_ram.Length == N_LAS
   }
+  predicate ri()
+  reads this;
+  reads las;
+  {
+    forall i | 0 <= i < p < las.Length ::
+                exists lbnd |  i <= lbnd <= p < las.Length ::
+                         las[i] == las[lbnd]
+                      && notin(lbnd, p, las[i], las)
+  }
+
 }
 
 method write (global0: Global, la: int, pa: int) returns (global1: Global)
@@ -39,6 +49,7 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
   modifies global0.pas;
   modifies global0;
   requires global0.inv();
+  requires global0.ri();
   requires 0 <= la && 0 <= pa;
   //ensures 0 <= global1.p < global1.N_DIFF
   //ensures la >= global0.N_LAS || pa >= global0.N_PAS ==> global0 == global1;
@@ -46,17 +57,16 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
   //ensures la < global0.N_LAS && pa < global0.N_PAS ==>
   //  global1.p == global1.N_DIFF - 1 ==> forall k: int :: 0 <= k < global1.N_LAS ==> global1.l2p_flash[k] == global1.l2p_ram[k]
   ensures global1.inv();
-  ensures forall i | 0 <= i < global1.p ::
-                   exists lbnd | i <= lbnd <= global1.p ::
-                            global1.las[i] == global1.las[lbnd]
-                         && notin(lbnd, global1.p, global1.las[i], global1.las);
+  ensures global1.ri();
 {
     global1 := global0;
     assert 0 <= global1.p < global1.N_DIFF;
     assert global1.l2p_flash.Length == global1.N_LAS;
     assert global1.l2p_ram.Length == global1.N_LAS;
     if (la >= global1.N_LAS || la < 0 || pa >= global1.N_PAS || pa < 0)
-      { return global1; }
+      {
+        return global1;
+      }
     assert la < global1.N_LAS && pa < global1.N_PAS;
     global1.l2p_ram[la] := pa;
     global1.las[global1.p] := la;
@@ -79,15 +89,16 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
     //assert global0.p < global0.N_DIFF ==> global1.p == global0.p + 1;
     assert global0.p == global0.N_DIFF ==> global1.p == 0;
     AllRI(global1);
+    assert forall i | 0 <= i < global1.p ::
+                     exists lbnd | i <= lbnd <= global1.p ::
+                              global1.las[i] == global1.las[lbnd]
+                           && notin(lbnd, global1.p, global1.las[i], global1.las);
     return global1;
 }
 
 lemma AllRI(global: Global)
   requires global.inv()
-  ensures forall i | 0 <= i < global.p ::
-                   exists lbnd | i <= lbnd <= global.p ::
-                            global.las[i] == global.las[lbnd]
-                         && notin(lbnd, global.p, global.las[i], global.las);
+  ensures global.ri()
 {
   var i := 0;
   var bnd := i + 1;
