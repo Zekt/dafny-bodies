@@ -89,10 +89,10 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
     //assert global0.p < global0.N_DIFF ==> global1.p == global0.p + 1;
     assert global0.p == global0.N_DIFF ==> global1.p == 0;
     AllRI(global1);
-    assert forall i | 0 <= i < global1.p ::
-                     exists lbnd | i <= lbnd <= global1.p ::
-                              global1.las[i] == global1.las[lbnd]
-                           && notin(lbnd, global1.p, global1.las[i], global1.las);
+    //assert forall i | 0 <= i < global1.p ::
+    //                 exists lbnd | i <= lbnd <= global1.p ::
+    //                          global1.las[i] == global1.las[lbnd]
+    //                       && notin(lbnd, global1.p, global1.las[i], global1.las);
     return global1;
 }
 
@@ -104,9 +104,9 @@ lemma AllRI(global: Global)
   var bnd := i + 1;
   RI(global, i);
   while(bnd < global.p)
-    invariant exists lbnd | i <= lbnd <= global.p ::
-                            global.las[i] == global.las[lbnd]
-                         && notin(lbnd, global.p, global.las[i], global.las);
+    //invariant exists lbnd | i <= lbnd <= global.p ::
+    //                        global.las[i] == global.las[lbnd]
+    //                     && notin(lbnd, global.p, global.las[i], global.las);
     invariant forall i | 0 <= i < bnd ::
                 exists lbnd | i <= lbnd <= global.p ::
                          global.las[i] == global.las[lbnd]
