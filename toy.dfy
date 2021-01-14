@@ -16,7 +16,7 @@ class Global{
     //   N_LAS == 4000000
     //&& N_PAS == 6000000
     //&& N_DIFF == 4000000
-       forall k: int :: 0 <= k < N_DIFF ==> las[k] == 0
+    && forall k: int :: 0 <= k < N_DIFF ==> las[k] == 0
     && forall k: int :: 0 <= k < N_DIFF ==> pas[k] == 0
     && forall k: int :: 0 <= k < N_LAS ==> l2p_ram[k] == 0
     && forall k: int :: 0 <= k < N_LAS ==> l2p_flash[k] == 0
@@ -24,7 +24,8 @@ class Global{
   predicate inv()
   reads this;
   {
-       0 <= p < N_DIFF
+       N_DIFF == N_LAS
+    && 0 <= p < N_DIFF
     && las.Length == N_DIFF
     && pas.Length == N_DIFF
     && l2p_flash.Length == N_LAS
@@ -35,7 +36,7 @@ class Global{
   reads las;
   {
     forall i | 0 <= i < p < las.Length ::
-                exists lbnd |  i <= lbnd <= p < las.Length ::
+                exists lbnd | i <= lbnd <= p < las.Length ::
                          las[i] == las[lbnd]
                       && notin(lbnd, p, las[i], las)
   }
@@ -60,7 +61,7 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
   ensures global1.ri();
 {
     global1 := global0;
-    assert 0 <= global1.p < global1.N_DIFF;
+    assert 0 <= global1.p < global1.N_DIFF <= global1.N_LAS;
     assert global1.l2p_flash.Length == global1.N_LAS;
     assert global1.l2p_ram.Length == global1.N_LAS;
     if (la >= global1.N_LAS || la < 0 || pa >= global1.N_PAS || pa < 0)
@@ -70,7 +71,13 @@ method write (global0: Global, la: int, pa: int) returns (global1: Global)
     assert la < global1.N_LAS && pa < global1.N_PAS;
     global1.l2p_ram[la] := pa;
     global1.las[global1.p] := la;
+    assert global1.las[global1.p] == la;
+    ghost var lass := global1.las;
     global1.pas[global1.p] := pa;
+    assert lass == global1.las;
+    assert global1.las[global1.p] == la;
+    //assert global1.l2p_ram[global1.las[global1.p]] == pa;
+    //assert global1.l2p_ram[global1.las[global1.p]] == global1.pas[global1.p];
     global1.p := global1.p + 1;
     if (global1.p == global1.N_DIFF)
       {
